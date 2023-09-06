@@ -17,20 +17,20 @@ public class InventoryServiceApplication {
 
 	//create data in database
 	//Bean will try to load data
-//	@Bean
-//		public CommandLineRunner loadData(InventoryRepository inventoryRepository){
-//			return args ->{
-//			Inventory inventory=new Inventory();
-//			inventory.setSkuCode("iphone_15");
-//			inventory.setQty(100);
-//
-//			Inventory inventory1=new Inventory();
-//			inventory1.setSkuCode("iphone_14");
-//			inventory1.setQty(0);
-//			inventoryRepository.save(inventory);
-//			inventoryRepository.save(inventory1);
-//			};
-//		}
+	@Bean
+		public CommandLineRunner loadData(InventoryRepository inventoryRepository){
+			return args ->{
+			Inventory inventory=new Inventory();
+			inventory.setSkuCode("iphone_15");
+			inventory.setQty(100);
+
+			Inventory inventory1=new Inventory();
+			inventory1.setSkuCode("iphone_14");
+			inventory1.setQty(0);
+			inventoryRepository.save(inventory);
+			inventoryRepository.save(inventory1);
+			};
+		}
 
 	}
 

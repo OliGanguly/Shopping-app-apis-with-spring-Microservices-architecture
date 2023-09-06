@@ -14,7 +14,7 @@ public class InventoryService {
     @Autowired
     private InventoryRepository inventoryRepository;
 
-    //    @Transactional(readOnly = true)
+//        @Transactional(readOnly = true)
 //    public boolean isInStock(List<String> skuCode){
 //        return inventoryRepository.findBySkuCodeIn(skuCode).isPresent();
 //    }
