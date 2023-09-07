@@ -15,4 +15,5 @@ public class WebClientConfig
     public WebClient webClient(){
       return WebClient.builder().build();
     }
+    //create a bean of type WebClient and name is webClient
 }

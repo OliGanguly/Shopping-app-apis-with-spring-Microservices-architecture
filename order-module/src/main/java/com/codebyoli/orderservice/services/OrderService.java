@@ -19,45 +19,68 @@ public class OrderService {
 
     @Autowired
     private OrderRepo orderRepo;
-    private WebClient webClient;
+    @Autowired
+    private  WebClient webClient;
+
+
+
+    /*call Inventory servic and place order if it is available - webclient
+         orderRepo.save(order);
+         oredr object setField done
+         call Inventory service
+         and place order if it is available - webclient
+        read the data from web client - bodyToMono
+        .block - synchronous call
+        -------------------------------------------------
+        INVENTORY CONTROLLER - PREVIOUS
+     public boolean isInStock(@PathVariable("sku-code") String skuCode){
+     return inventoryService.isInStock(skuCode);
+     }
+     Boolean result = webClient.get().uri("").retrieve().bodyToMono(Boolean.class).block();
+    if(result){
+        //save
+    }else {
+        throw new Exception();
+    }
+    * */
+    /*
+    * OUR REQUIRMENT
+    * ORDER has many ORDERLINEITEMS
+    * Each ORDERLINEITEM has skucode
+    * */
     public void createOrder(OrderRequest orderRequest){
         Order order = new Order();
-        //oredr no
         order.setOrderNumber(UUID.randomUUID().toString());
-        //fetch oredrline items from orderRequest
-        //Listdto convert
          List<OrderLineItems> listData =
                  orderRequest.getOrderLineItemsDto().stream().
                  map(orderLineItemsDto -> DtotoOrderListItems(orderLineItemsDto))
                 .toList();
          order.setOrderLineItems(listData);
-         orderRepo.save(order);
-         //oredr object setField done
-//        --------------------------------------------
-         //call Inventory service
-         //and place order if it is available - webclient
-        //readt data from web client - bodyToMono
+         //Collect all skucode from order obj
+         List<String> skuCodes = order.
+                 getOrderLineItems()
+                 .stream()
+                 .map(orderLineItems -> orderLineItems.getSkucode())
+                 .toList();
+/*we have to create inventoryResponse in order service as well , cause we can not access Inverntory service class here
+        but the return type is InventoryResponse*/
+        InventoryResponse[] inventoryResponseArray = webClient.get()
+                .uri("http://localhost:8082/api/inventory",
+                        uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+                .retrieve()
+                .bodyToMono(InventoryResponse[].class)
+                .block();
 
-        //Collect all skucode from order obj
-//        List<String> skuCodes =
-//                order.getOrderLineItems().stream().map(
-//                orderLineItems -> orderLineItems.getSkucode()).
-//                toList();
-//
-//        //it will return inventory response
-//        InventoryResponse [] inventoryResponsesArray = webClient.get().
-//                uri("http://localhost:8082/api/inventory",
-//                        uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
-//                .retrieve()
-//                .bodyToMono(InventoryResponse[].class)
-//                .block();
-//        boolean allProducts = Arrays.stream(inventoryResponsesArray).allMatch(inventoryResponse -> inventoryResponse.isInStock());
-//        if(allProducts){
-//            orderRepo.save(order);
-//        }else{
-//           throw new IllegalArgumentException("Product is not in stock");
-//        }
+        System.out.println("inventoryResponseArray"+inventoryResponseArray);
 
+        boolean allProducts=Arrays.
+                stream(inventoryResponseArray).
+                allMatch(inventoryResponse ->inventoryResponse.isInStock());
+        if(allProducts){
+            orderRepo.save(order);
+        }else {
+            throw new IllegalArgumentException("Product is not in stock");
+        }
 
     }
     //covert order line dto to orderLineItems
