@@ -10,6 +10,22 @@ is called Synchronous communication
 
 opposite A service sends a req to B and does not care about response is called Asynchronous Communication
 
+# Eureka Server Configuration
+application.properties
+
+eureka.instance.hostname=localhost
+
+eureka.client.register-with-eureka=false //its a discovery server we dont want it to register itself
+
+eureka.client.fetch-registry=false 
+
+# Client Side
+
+@EnableEurekaClient
+
+application.properties
+
+eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka
 
 
 

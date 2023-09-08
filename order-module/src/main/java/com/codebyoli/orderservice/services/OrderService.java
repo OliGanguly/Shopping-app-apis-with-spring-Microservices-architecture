@@ -20,7 +20,7 @@ public class OrderService {
     @Autowired
     private OrderRepo orderRepo;
     @Autowired
-    private  WebClient webClient;
+    private  WebClient.Builder webClientBuilder;
 
 
 
@@ -64,8 +64,15 @@ public class OrderService {
                  .toList();
 /*we have to create inventoryResponse in order service as well , cause we can not access Inverntory service class here
         but the return type is InventoryResponse*/
-        InventoryResponse[] inventoryResponseArray = webClient.get()
-                .uri("http://localhost:8082/api/inventory",
+//        InventoryResponse[] inventoryResponseArray = webClient.get()
+//                .uri("http://localhost:8082/api/inventory",
+//                        uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+//                .retrieve()
+//                .bodyToMono(InventoryResponse[].class)
+//                .block();
+
+        InventoryResponse[] inventoryResponseArray = webClientBuilder.build().get()
+                .uri("http://inventory-service/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
